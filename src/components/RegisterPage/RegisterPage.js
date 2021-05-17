@@ -1,6 +1,8 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import firebase from "../../firebase";
+import md5 from "md5";
 
 function RegisterPage() {
   const {
@@ -9,10 +11,42 @@ function RegisterPage() {
     watch,
     formState: { errors },
   } = useForm();
+
+  const [errorFromSubmit, setErrorFromSubmit] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const password = useRef();
   password.current = watch("password");
-  console.log(watch("email"));
-  const onSubmit = (data) => console.log(data);
+
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
+      let createUser = await firebase
+        .auth()
+        .createUserWithEmailAndPassword(data.email, data.password);
+      console.log("createUser", createUser);
+
+      await createUser.user.updateProfile({
+        displayName: data.name,
+        photoURL: `http://gravatar.com/avatar/${md5(
+          createUser.user.email
+        )}?d=identicon`,
+      });
+
+      await firebase.database().ref("users").child(createUser.user.uid).set({
+        name: createUser.user.displayName,
+        image: createUser.user.photoURL,
+      });
+
+      setLoading(false);
+    } catch (error) {
+      setErrorFromSubmit(error.message);
+      setLoading(false);
+      setTimeout(() => {
+        setErrorFromSubmit("");
+      }, 5000);
+    }
+  };
 
   return (
     <div className="auth-wrapper">
@@ -72,7 +106,9 @@ function RegisterPage() {
             <span>The password do not match</span>
           )}
 
-        <input type="submit" />
+        {errorFromSubmit && <span> {errorFromSubmit} </span>}
+
+        <input type="submit" disabled={loading} />
       </form>
       <Link
         style={{ textAlign: "center", color: "gray", textDecoration: "none" }}
