@@ -11,6 +11,19 @@ export class ChatRooms extends Component {
     name: "",
     description: "",
     chatRoomsRef: firebase.database().ref("chatRooms"),
+    chatRooms: [],
+  };
+
+  componentDidMount() {
+    this.AddChatRoomsListeners();
+  }
+
+  AddChatRoomsListeners = () => {
+    let chatRoomsArray = [];
+    this.state.chatRoomsRef.on("child_added", (DataSnapshot) => {
+      chatRoomsArray.push(DataSnapshot.val());
+      this.setState({ chatRooms: chatRoomsArray });
+    });
   };
 
   handleClose = () => this.setState({ show: false });
@@ -50,6 +63,10 @@ export class ChatRooms extends Component {
   };
   isFormValid = (name, description) => name && description;
 
+  renderChatRooms = (chatRooms) =>
+    chatRooms.length > 0 &&
+    chatRooms.map((room) => <li key={room.id}># {room.name}</li>);
+
   render() {
     return (
       <div>
@@ -72,6 +89,9 @@ export class ChatRooms extends Component {
             }}
           />
         </div>
+        <ul style={{ listStyleType: "none", padding: 0 }}>
+          {this.renderChatRooms(this.state.chatRooms)}
+        </ul>
 
         <Modal show={this.state.show} onHide={this.handleClose}>
           <Modal.Header closeButton>
