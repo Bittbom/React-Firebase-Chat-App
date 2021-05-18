@@ -4,6 +4,7 @@ import { IoIosChatboxes } from "react-icons/io";
 import Dropdown from "react-bootstrap/Dropdown";
 import Image from "react-bootstrap/Image";
 import firebase from "../../../firebase";
+import mime from "mime-types";
 
 function UserPanel() {
   const user = useSelector((state) => state.user.currentUser);
@@ -15,9 +16,19 @@ function UserPanel() {
     inputOpenImageRef.current.click();
   };
 
-  const handleUploadImage = () => {
-     
-  }
+  const handleUploadImage = async (event) => {
+    const file = event.target.files[0];
+    const metadata = { contentType: mime.lookup(file.name) };
+
+    try {
+      let uploadTaskSnapshot = await firebase
+        .storage()
+        .ref()
+        .child(`user_image/${user.uid}`)
+        .put(file, metadata);
+      console.log("uploadTaskSnapshot", uploadTaskSnapshot);
+    } catch (error) {}
+  };
   return (
     <div>
       <h3 style={{ color: "white" }}>
