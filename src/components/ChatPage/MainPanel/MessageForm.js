@@ -72,7 +72,7 @@ function MessageForm() {
       <ProgressBar variant="warning" label="60%" now={60} />
       <div>
         {errors.map((errorMsg) => (
-          <p style={{ color: red }} key={errorMsg}>
+          <p style={{ color: "red" }} key={errorMsg}>
             {" "}
             {errorMsg}{" "}
           </p>

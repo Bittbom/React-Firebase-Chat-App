@@ -4,11 +4,12 @@ import MessageForm from "./MessageForm";
 import MessageHeader from "./MessageHeader";
 import { connect } from "react-redux";
 import firebase from "../../../firebase";
+
 export class MainPanel extends Component {
   state = {
     messages: [],
     messagesRef: firebase.database().ref("messages"),
-    messagesLoading: true,
+    messagesLoading: false,
   };
 
   componentDidMount() {
@@ -28,16 +29,15 @@ export class MainPanel extends Component {
       });
   };
 
-  renderMessages = (messages) => {
-    messages > 0 &&
-      messages.map((message) => (
-        <Message
-          key={message.timestamp}
-          message={message}
-          user={this.props.user}
-        />
-      ));
-  };
+  renderMessages = (messages) =>
+    messages.length > 0 &&
+    messages.map((message) => (
+      <Message
+        key={message.timestamp}
+        message={message}
+        user={this.props.user}
+      />
+    ));
 
   render() {
     const { messages } = this.state;
