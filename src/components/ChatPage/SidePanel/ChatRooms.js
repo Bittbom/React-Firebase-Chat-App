@@ -22,7 +22,7 @@ export class ChatRooms extends Component {
   }
 
   componentWillUnmount() {
-    this.setState.chatRooms.off();
+    this.state.chatRoomsRef.off();
   }
 
   setFirstChatRoom = () => {
