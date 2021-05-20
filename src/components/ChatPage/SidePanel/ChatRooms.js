@@ -21,6 +21,10 @@ export class ChatRooms extends Component {
     this.AddChatRoomsListeners();
   }
 
+  componentWillUnmount() {
+    this.setState.chatRooms.off();
+  }
+
   setFirstChatRoom = () => {
     const firstChatRoom = this.state.chatRooms[0];
     if (this.state.firstLoad && this.state.chatRooms.length > 0) {
