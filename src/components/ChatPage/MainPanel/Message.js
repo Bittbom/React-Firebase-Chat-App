@@ -11,7 +11,7 @@ function Message({ message, user }) {
     );
   };
 
-  const isMessageMine = ( message, user ) => {
+  const isMessageMine = (message, user) => {
     return message.user.id === user.id;
   };
 
@@ -28,7 +28,7 @@ function Message({ message, user }) {
         alt={message.user.name}
       />
       <Media.Body
-        style={{ backgroundColor: isMessageMine(message, user) && "#ececec" }}
+        style={{ backgroundColor: isMessageMine(message, user) && "#ECECEC" }}
       >
         <h6>
           {message.user.name}{" "}
@@ -48,4 +48,3 @@ function Message({ message, user }) {
 }
 
 export default Message;
-
