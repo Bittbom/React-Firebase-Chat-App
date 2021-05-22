@@ -62,7 +62,7 @@ export class DirectMessages extends Component {
       <li
         key={user.id}
         style={{
-          backgroundColor: user.uid === this.activeChatRoom && "#ffffff45",
+          backgroundColor: user.uid === this.state.activeChatRoom && "#ffffff45",
         }}
         onClick={() => this.changeChatRoom(user)}
       >
