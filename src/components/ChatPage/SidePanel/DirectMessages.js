@@ -2,10 +2,16 @@ import React, { Component } from "react";
 import { FaRegSmile } from "react-icons/fa";
 import firebase from "../../../firebase";
 import { connect } from "react-redux";
+import {
+  setCurrentChatRoom,
+  setPrivateChatRoom,
+} from "../../../redux/actions/chatRoom_action";
+
 export class DirectMessages extends Component {
   state = {
     usersRef: firebase.database().ref("users"),
     users: [],
+    activeChatRoom: "",
   };
 
   componentDidMount() {
@@ -37,12 +43,29 @@ export class DirectMessages extends Component {
 
   changeChatRoom = (user) => {
     const chatRoomId = this.getChatRoomId(user.uid);
+    const chatRoomData = {
+      id: chatRoomId,
+      name: user.name,
+    };
+    this.props.dispatch(setCurrentChatRoom(chatRoomData));
+    this.props.dispatch(setPrivateChatRoom(true));
+    this.setActiveChatRoom(user.uid);
+  };
+
+  setActiveChatRoom = (userId) => {
+    this.setState({ activeChatRoom: userId });
   };
 
   renderDirectMessages = (users) =>
     users.length > 0 &&
     users.map((user) => (
-      <li key={user.id} onClick={this.changeChatRoom(user)}>
+      <li
+        key={user.id}
+        style={{
+          backgroundColor: user.uid === this.activeChatRoom && "#ffffff45",
+        }}
+        onClick={() => this.changeChatRoom(user)}
+      >
         # {user.name}
       </li>
     ));
