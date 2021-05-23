@@ -29,6 +29,9 @@ export class ChatRooms extends Component {
 
   componentWillUnmount() {
     this.state.chatRoomsRef.off();
+    this.state.chatRooms.firEach((chatRoom) => {
+      this.state.messagesRef.child(chatRoom.id).off();
+    });
   }
 
   setFirstChatRoom = () => {
@@ -135,6 +138,20 @@ export class ChatRooms extends Component {
     this.props.dispatch(setCurrentChatRoom(room));
     this.props.dispatch(setPrivateChatRoom(false));
     this.setState({ activeChatRoomId: room.id });
+    this.clearNotifications();
+  };
+
+  clearNotifications = () => {
+    let index = this.state.notifications.findIndex(
+      (notification) => notification.id === this.props.chatRoom.id
+    );
+    if (index !== -1) {
+      let updateNotifications = [...this.state.notifications];
+      updateNotifications[index].lastKnownTotal =
+        this.state.notifications[index].total;
+      updateNotifications[index].count = 0;
+      this.setState({ notifications: updateNotifications });
+    }
   };
 
   getNotificationCount = (room) => {
