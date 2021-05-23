@@ -12,7 +12,9 @@ function Message({ message, user }) {
   };
 
   const isMessageMine = (message, user) => {
-    return message.user.id === user.id;
+    if (user) {
+      return message.user.id === user.id;
+    }
   };
 
   return (

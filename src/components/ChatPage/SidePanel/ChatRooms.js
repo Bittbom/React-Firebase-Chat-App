@@ -29,7 +29,7 @@ export class ChatRooms extends Component {
 
   componentWillUnmount() {
     this.state.chatRoomsRef.off();
-    this.state.chatRooms.firEach((chatRoom) => {
+    this.state.chatRooms.forEach((chatRoom) => {
       this.state.messagesRef.child(chatRoom.id).off();
     });
   }
