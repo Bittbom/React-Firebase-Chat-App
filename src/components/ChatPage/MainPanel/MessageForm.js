@@ -15,9 +15,11 @@ function MessageForm() {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [percentage, setPercentage] = useState(0);
+
   const messagesRef = firebase.database().ref("messages");
   const inputOpenImageRef = useRef();
   const storageRef = firebase.storage().ref();
+  
   const isPrivateChatRoom = useSelector(
     (state) => state.chatRoom.isPrivateChatRoom
   );

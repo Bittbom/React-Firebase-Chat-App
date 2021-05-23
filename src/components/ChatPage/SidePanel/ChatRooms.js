@@ -3,9 +3,13 @@ import { FaRegSmileWink, FaPlus } from "react-icons/fa";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Badge from "react-bootstrap/Badge";
 import { connect } from "react-redux";
 import firebase from "../../../firebase";
-import { setCurrentChatRoom, setPrivateChatRoom } from "../../../redux/actions/chatRoom_action";
+import {
+  setCurrentChatRoom,
+  setPrivateChatRoom,
+} from "../../../redux/actions/chatRoom_action";
 export class ChatRooms extends Component {
   state = {
     show: false,
@@ -99,6 +103,11 @@ export class ChatRooms extends Component {
         onClick={() => this.changeChatRoom(room)}
       >
         # {room.name}
+        <Badge
+          style={{ float: "right", marginTop: "4px" }}
+          variant="danger"
+        >1
+        </Badge>
       </li>
     ));
 
