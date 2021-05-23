@@ -16,9 +16,11 @@ export class ChatRooms extends Component {
     name: "",
     description: "",
     chatRoomsRef: firebase.database().ref("chatRooms"),
+    messagesRef: firebase.database().ref("messages"),
     chatRooms: [],
     firstLoad: true,
     activeChatRoomId: "",
+    notifications: [],
   };
 
   componentDidMount() {
@@ -45,7 +47,51 @@ export class ChatRooms extends Component {
       this.setState({ chatRooms: chatRoomsArray }, () =>
         this.setFirstChatRoom()
       );
+      this.addNotificationListener(DataSnapshot.key);
     });
+  };
+
+  addNotificationListener = (chatRoomId) => {
+    this.state.messagesRef.child(chatRoomId).on("value", (DataSnapshot) => {
+      console.log("DataSnapshot", DataSnapshot);
+      if (this.props.chatRoom) {
+        this.handleNotification(
+          chatRoomId,
+          this.props.chatRoom.id,
+          this.state.notifications,
+          DataSnapshot
+        );
+      }
+    });
+  };
+
+  handleNotification = (
+    chatRoomId,
+    currentChatRoomId,
+    notifications,
+    DataSnapshot
+  ) => {
+    let lastTotal = 0;
+    let index = notifications.findIndex(
+      (notification) => notification.id === chatRoomId
+    );
+    if (index === -1) {
+      notifications.push({
+        id: chatRoomId,
+        total: DataSnapshot.numChildren(),
+        lastKnownTotal: DataSnapshot.numChildren(),
+        count: 0,
+      });
+    } else {
+      if (chatRoomId !== currentChatRoomId) {
+        lastTotal = notifications[index].lastKnownTotal;
+        if (DataSnapshot.numChildren() - lastTotal > 0) {
+          notifications[index].count = DataSnapshot.numChildren() - lastTotal;
+        }
+      }
+      notifications[index].total = DataSnapshot.numChildren();
+    }
+    this.setState({ notifications });
   };
 
   handleClose = () => this.setState({ show: false });
@@ -91,6 +137,16 @@ export class ChatRooms extends Component {
     this.setState({ activeChatRoomId: room.id });
   };
 
+  getNotificationCount = (room) => {
+    let count = 0;
+    this.state.notifications.forEach((notification) => {
+      if (notification.id === room.id) {
+        count = notification.count;
+      }
+    });
+    if (count > 0) return;
+  };
+
   renderChatRooms = (chatRooms) =>
     chatRooms.length > 0 &&
     chatRooms.map((room) => (
@@ -103,10 +159,8 @@ export class ChatRooms extends Component {
         onClick={() => this.changeChatRoom(room)}
       >
         # {room.name}
-        <Badge
-          style={{ float: "right", marginTop: "4px" }}
-          variant="danger"
-        >1
+        <Badge style={{ float: "right", marginTop: "4px" }} variant="danger">
+          {this.getNotificationCount(room)}
         </Badge>
       </li>
     ));
@@ -181,6 +235,7 @@ export class ChatRooms extends Component {
 const mapStateToProps = (state) => {
   return {
     user: state.user.currentUser,
+    chatRoom: state.chatRoom.currentChatRoom,
   };
 };
 
