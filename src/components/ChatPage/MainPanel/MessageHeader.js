@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -9,9 +9,10 @@ import Accordion from "react-bootstrap/Accordion";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { FaLock, FaLockOpen } from "react-icons/fa";
-import { MdFavorite } from "react-icons/md";
+import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
 import { AiOutlineSearch } from "react-icons/ai";
 import { useSelector } from "react-redux";
+import firebase from "../../../firebase";
 
 AiOutlineSearch;
 
@@ -20,6 +21,35 @@ function MessageHeader({ handleSearchChange }) {
   const isPrivateChatRoom = useSelector(
     (state) => state.chatRoom.isPrivateChatRoom
   );
+  const [isFavorited, setIsFavorited] = useState(false);
+  const usersRef = firebase.database().ref("users");
+  const user = useSelector((state) => state.user.currentUser);
+
+  const handleFavorite = () => {
+    if (isFavorited) {
+      usersRef
+        .child(`${user.uid}/favorited`)
+        .child(chatRoom.id)
+        .remove((err) => {
+          if (err !== null) {
+            console.error(err);
+          }
+        });
+      setIsFavorited((prev) => !prev);
+    } else {
+      usersRef.child(`${user.uid}/favorited`).update({
+        [chatRoom.id]: {
+          name: chatRoom.name,
+          description: chatRoom.description,
+          createdBy: {
+            name: chatRoom.createdBy.name,
+            image: chatRoom.createdBy.image,
+          },
+        },
+      });
+      setIsFavorited((prev) => !prev);
+    }
+  };
   return (
     <div
       style={{
@@ -41,7 +71,16 @@ function MessageHeader({ handleSearchChange }) {
               ) : (
                 <FaLockOpen style={{ marginBottom: "10px" }} />
               )}
-              {chatRoom && chatRoom.name} <MdFavorite />{" "}
+              {chatRoom && chatRoom.name}
+              {!isPrivateChatRoom && (
+                <span style={{ cursor: "pointer" }} onClick={handleFavorite}>
+                  {isFavorited ? (
+                    <MdFavorite style={{ marginBottom: "10px" }} />
+                  ) : (
+                    <MdFavoriteBorder style={{ marginBottom: "10px" }} />
+                  )}
+                </span>
+              )}
             </h2>
           </Col>
           <Col>
