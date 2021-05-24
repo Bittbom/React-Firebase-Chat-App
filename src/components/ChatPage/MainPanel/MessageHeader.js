@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -14,8 +14,6 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { useSelector } from "react-redux";
 import firebase from "../../../firebase";
 
-AiOutlineSearch;
-
 function MessageHeader({ handleSearchChange }) {
   const chatRoom = useSelector((state) => state.chatRoom.currentChatRoom);
   const isPrivateChatRoom = useSelector(
@@ -24,6 +22,28 @@ function MessageHeader({ handleSearchChange }) {
   const [isFavorited, setIsFavorited] = useState(false);
   const usersRef = firebase.database().ref("users");
   const user = useSelector((state) => state.user.currentUser);
+
+  useEffect(() => {
+    if (chatRoom && user) {
+      addFavoriteListener(chatRoom.id, user.uid);
+    }
+  }, []);
+
+  const addFavoriteListener = (chatRoomId, userId) => {
+    usersRef
+      .child(userId)
+      .child("favorited")
+      .once("value")
+      .then((data) => {
+        if (data.val() !== null) {
+          const chatRoomIds = Object.keys(data.val());
+          console.log("data.val()", data.val());
+          console.log("chatRoomIds", chatRoomIds);
+          const isAlreadyFavorited = chatRoomIds.includes(chatRoomId)
+          setIsFavorited(isAlreadyFavorited)
+        }
+      });
+  };
 
   const handleFavorite = () => {
     if (isFavorited) {
