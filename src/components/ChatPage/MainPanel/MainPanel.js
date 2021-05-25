@@ -7,6 +7,8 @@ import firebase from "../../../firebase";
 import { setUserPosts } from "../../../redux/actions/chatRoom_action";
 
 export class MainPanel extends Component {
+  messageEndRef = React.createRef();
+
   state = {
     messages: [],
     messagesRef: firebase.database().ref("messages"),
@@ -24,6 +26,14 @@ export class MainPanel extends Component {
     if (chatRoom) {
       this.addMessagesListeners(chatRoom.id);
       this.addTypingListeners(chatRoom.id);
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.messageEndRef) {
+      this.messageEndRef.scrollIntoView({
+        behavior: "smooth",
+      });
     }
   }
 
@@ -154,6 +164,7 @@ export class MainPanel extends Component {
     return (
       <div style={{ padding: "2rem 2rem 0 2rem" }}>
         <MessageHeader handleSearchChange={this.handleSearchChange} />
+
         <div
           style={{
             width: "100%",
@@ -162,14 +173,16 @@ export class MainPanel extends Component {
             borderRadius: "4px",
             padding: "1rem",
             marginBottom: "1rem",
-            overFlowY: "auto",
+            overflowY: "auto",
           }}
         >
           {searchTerm
             ? this.renderMessages(searchResults)
             : this.renderMessages(messages)}
           {this.renderTypingUsers(typingUsers)}
+          <div ref={(node) => (this.messageEndRef = node)} />
         </div>
+
         <MessageForm />
       </div>
     );
