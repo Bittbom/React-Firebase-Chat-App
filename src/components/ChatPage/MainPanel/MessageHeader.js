@@ -39,8 +39,8 @@ function MessageHeader({ handleSearchChange }) {
           const chatRoomIds = Object.keys(data.val());
           console.log("data.val()", data.val());
           console.log("chatRoomIds", chatRoomIds);
-          const isAlreadyFavorited = chatRoomIds.includes(chatRoomId)
-          setIsFavorited(isAlreadyFavorited)
+          const isAlreadyFavorited = chatRoomIds.includes(chatRoomId);
+          setIsFavorited(isAlreadyFavorited);
         }
       });
   };
@@ -126,7 +126,12 @@ function MessageHeader({ handleSearchChange }) {
           }}
         >
           <p>
-            <Image src="" /> user name
+            <Image
+              src={chatRoom && chatRoom.createdBy.image}
+              roundedCircle
+              style={{ width: "30px", height: "30px" }}
+            />{" "}
+            {chatRoom && chatRoom.createdBy.name}
           </p>
         </div>
 
@@ -136,11 +141,11 @@ function MessageHeader({ handleSearchChange }) {
               <Card>
                 <Card.Header style={{ padding: "0 1rem" }}>
                   <Accordion.Toggle as={Button} variant="link" eventKey="0">
-                    Click me!
+                    Description
                   </Accordion.Toggle>
                 </Card.Header>
                 <Accordion.Collapse eventKey="0">
-                  <Card.Body>Hello! I'm the body</Card.Body>
+                  <Card.Body>{chatRoom && chatRoom.description}</Card.Body>
                 </Accordion.Collapse>
               </Card>
             </Accordion>
