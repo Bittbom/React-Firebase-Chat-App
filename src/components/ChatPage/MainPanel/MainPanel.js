@@ -4,24 +4,47 @@ import MessageForm from "./MessageForm";
 import MessageHeader from "./MessageHeader";
 import { connect } from "react-redux";
 import firebase from "../../../firebase";
-import {setUserPosts} from '../../../redux/actions/chatRoom_action'
+import { setUserPosts } from "../../../redux/actions/chatRoom_action";
 
 export class MainPanel extends Component {
   state = {
     messages: [],
     messagesRef: firebase.database().ref("messages"),
+    typingRef: firebase.database().ref("typing"),
     messagesLoading: false,
     searchTerm: "",
     searchResults: [],
     searchLoading: false,
+    typingUsers:[]
   };
 
   componentDidMount() {
     const { chatRoom } = this.props;
     if (chatRoom) {
       this.addMessagesListeners(chatRoom.id);
+      this.addTypingListeners(chatRoom.id);
     }
   }
+
+  addTypingListeners = (chatRoomId) => {
+    let typingUsers = [];
+    this.state.typingRef.child(chatRoomId).on('child_added', DataSnapshot => {
+      if(DataSnapshot.key !== this.props.user.uid) {
+        typingUsers = typingUsers.concat({
+          id:DataSnapshot.key,
+          name: DataSnapshot.val()
+        })
+        this.setState({typingUsers})
+      }
+    })
+    this.state.typingRef.child(chatRoomId).on('child_removed', DataSnapshot => {
+      const index = typingUsers.findIndex(user => user.id === DataSnapshot.key)
+      if(index !== -1) {
+        typingUsers = typingUsers.filter(user => user.id !== DataSnapshot.key)
+        this.setState({typingUsers})
+      }
+    })
+  };
 
   handleSearchMessages = () => {
     const chatRoomMessages = [...this.state.messages];
