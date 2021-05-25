@@ -37,8 +37,8 @@ function MessageHeader({ handleSearchChange }) {
       .then((data) => {
         if (data.val() !== null) {
           const chatRoomIds = Object.keys(data.val());
-          console.log("data.val()", data.val());
-          console.log("chatRoomIds", chatRoomIds);
+          // console.log("data.val()", data.val());
+          // console.log("chatRoomIds", chatRoomIds);
           const isAlreadyFavorited = chatRoomIds.includes(chatRoomId);
           setIsFavorited(isAlreadyFavorited);
         }
@@ -119,6 +119,7 @@ function MessageHeader({ handleSearchChange }) {
             </InputGroup>
           </Col>
         </Row>
+
         <div
           style={{
             display: "flex",
